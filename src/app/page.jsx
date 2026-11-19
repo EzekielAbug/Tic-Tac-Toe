@@ -4,18 +4,31 @@ import { useState, useEffect } from "react";
 import PlantSprite from "@/components/game/PlantSprite";
 import ZombieSprite from "@/components/game/ZombieSprite";
 import Scoreboard from "@/components/scoreboard/Scoreboard";
+import GameControls from "@/components/game/GameControls";
 import { useGameReducer } from "@/hooks/useGameReducer";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { FACTIONS, GAME_STATUS } from "@/constants/game";
+import { getAiMove } from "@/lib/game/ai";
+import { FACTIONS, GAME_STATUS, GAME_MODES } from "@/constants/game";
 import { STORAGE_KEYS, DEFAULT_SCORES } from "@/lib/storage/localStorage";
 
 /**
  * Garden Clash — Main Application Page
+ * Supports both PvP (2P local) and PvE (vs AI with Easy, Medium, Hard).
  */
 export default function Home() {
   const [isNight, setIsNight] = useState(false);
   const { state, actions } = useGameReducer();
   const [scores, setScores] = useLocalStorage(STORAGE_KEYS.SCORES, DEFAULT_SCORES);
+
+  const isGameOver =
+    state.gameStatus === GAME_STATUS.PLANT_WINS ||
+    state.gameStatus === GAME_STATUS.ZOMBIE_WINS ||
+    state.gameStatus === GAME_STATUS.DRAW;
+
+  const isAiTurn =
+    state.gameMode === GAME_MODES.PVE &&
+    !isGameOver &&
+    state.currentFaction !== state.humanFaction;
 
   /** Toggle the theme class on the <html> element */
   function handleThemeToggle() {
@@ -25,6 +38,27 @@ export default function Home() {
       return next;
     });
   }
+
+  /**
+   * PvE AI Response Effect
+   * Schedules the computer's move after a natural thinking delay.
+   */
+  useEffect(() => {
+    if (!isAiTurn) return;
+
+    const timer = setTimeout(() => {
+      const move = getAiMove(
+        state.board,
+        state.aiDifficulty,
+        state.currentFaction
+      );
+      if (move !== null) {
+        actions.makeMove(move);
+      }
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [isAiTurn, state.board, state.aiDifficulty, state.currentFaction, actions]);
 
   /**
    * Listen for terminal game conditions and record scores.
@@ -63,6 +97,13 @@ export default function Home() {
   } else if (state.gameStatus === GAME_STATUS.DRAW) {
     statusText = "🤝 IT'S A DRAW!";
     statusModifierClass = "turn-indicator-banner--win";
+  } else if (isAiTurn) {
+    const aiIcon = state.currentFaction === FACTIONS.PLANT ? "🌻" : "🧟";
+    statusText = `${aiIcon} COMPUTER IS THINKING...`;
+    statusModifierClass =
+      state.currentFaction === FACTIONS.PLANT
+        ? "turn-indicator-banner--plant"
+        : "turn-indicator-banner--zombie";
   } else {
     if (state.currentFaction === FACTIONS.PLANT) {
       statusText = "🌻 PLANTS' TURN";
@@ -120,15 +161,17 @@ export default function Home() {
               state.gameStatus === GAME_STATUS.ZOMBIE_WINS ||
               state.gameStatus === GAME_STATUS.DRAW;
 
+            const isCellDisabled = cell !== null || isGameOver || isAiTurn;
+
             return (
               <button
                 key={index}
                 type="button"
                 className={`cell ${cell ? "cell--occupied" : ""} ${
                   isWinningCell ? "cell--winning" : ""
-                } ${isGameOver ? "cell--disabled" : ""}`}
+                } ${isCellDisabled ? "cell--disabled" : ""}`}
                 onClick={() => actions.makeMove(index)}
-                disabled={cell !== null || isGameOver}
+                disabled={isCellDisabled}
                 aria-label={`Cell ${index + 1}: ${cell || "empty"}`}
               >
                 {cell === FACTIONS.PLANT && <PlantSprite size={84} />}
@@ -138,31 +181,21 @@ export default function Home() {
           })}
         </div>
 
-        {/* Game Controls */}
-        <div className="controls-bar">
-          <button
-            type="button"
-            className="pixel-btn"
-            onClick={handleThemeToggle}
-          >
-            {isNight ? "☀️ Day" : "🌙 Night"}
-          </button>
-          <button
-            type="button"
-            className="pixel-btn pixel-btn--plant"
-            onClick={() => actions.startNewGame()}
-          >
-            New Game
-          </button>
-          <button
-            type="button"
-            className="pixel-btn pixel-btn--small"
-            onClick={() => actions.undoMove()}
-            disabled={state.moveHistory.length === 0}
-          >
-            ↩ Undo
-          </button>
-        </div>
+        {/* Interactive Controls & Mode Selector */}
+        <GameControls
+          gameMode={state.gameMode}
+          aiDifficulty={state.aiDifficulty}
+          humanFaction={state.humanFaction}
+          canUndo={state.moveHistory.length > 0}
+          isAiThinking={isAiTurn}
+          onSetGameMode={actions.setGameMode}
+          onSetAiDifficulty={actions.setAiDifficulty}
+          onSetHumanFaction={actions.setHumanFaction}
+          onNewGame={() => actions.startNewGame()}
+          onUndo={actions.undoMove}
+          isNight={isNight}
+          onToggleTheme={handleThemeToggle}
+        />
 
         {/* Scoreboard */}
         <Scoreboard
