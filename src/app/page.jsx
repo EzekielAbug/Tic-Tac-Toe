@@ -1,19 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import PlantSprite from "@/components/game/PlantSprite";
-import ZombieSprite from "@/components/game/ZombieSprite";
-import Scoreboard from "@/components/scoreboard/Scoreboard";
+import Board from "@/components/game/Board";
+import TurnIndicator from "@/components/game/TurnIndicator";
+import ResultOverlay from "@/components/game/ResultOverlay";
 import GameControls from "@/components/game/GameControls";
+import Scoreboard from "@/components/scoreboard/Scoreboard";
 import { useGameReducer } from "@/hooks/useGameReducer";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { getAiMove } from "@/lib/game/ai";
-import { FACTIONS, GAME_STATUS, GAME_MODES } from "@/constants/game";
+import { GAME_STATUS, GAME_MODES } from "@/constants/game";
 import { STORAGE_KEYS, DEFAULT_SCORES } from "@/lib/storage/localStorage";
 
 /**
  * Garden Clash — Main Application Page
- * Supports both PvP (2P local) and PvE (vs AI with Easy, Medium, Hard).
+ * Composes the game components cleanly: Board, TurnIndicator, ResultOverlay, Controls, Scoreboard.
  */
 export default function Home() {
   const [isNight, setIsNight] = useState(false);
@@ -55,7 +56,7 @@ export default function Home() {
       if (move !== null) {
         actions.makeMove(move);
       }
-    }, 450);
+    }, 420);
 
     return () => clearTimeout(timer);
   }, [isAiTurn, state.board, state.aiDifficulty, state.currentFaction, actions]);
@@ -82,36 +83,6 @@ export default function Home() {
   /** Reset all scores */
   function handleResetScores() {
     setScores(DEFAULT_SCORES);
-  }
-
-  // Format turn indicator & status banner text
-  let statusText = "";
-  let statusModifierClass = "";
-
-  if (state.gameStatus === GAME_STATUS.PLANT_WINS) {
-    statusText = "🌻 PLANTS WIN! 🎉";
-    statusModifierClass = "turn-indicator-banner--plant turn-indicator-banner--win";
-  } else if (state.gameStatus === GAME_STATUS.ZOMBIE_WINS) {
-    statusText = "🧟 ZOMBIES WIN! 🧠";
-    statusModifierClass = "turn-indicator-banner--zombie turn-indicator-banner--win";
-  } else if (state.gameStatus === GAME_STATUS.DRAW) {
-    statusText = "🤝 IT'S A DRAW!";
-    statusModifierClass = "turn-indicator-banner--win";
-  } else if (isAiTurn) {
-    const aiIcon = state.currentFaction === FACTIONS.PLANT ? "🌻" : "🧟";
-    statusText = `${aiIcon} COMPUTER IS THINKING...`;
-    statusModifierClass =
-      state.currentFaction === FACTIONS.PLANT
-        ? "turn-indicator-banner--plant"
-        : "turn-indicator-banner--zombie";
-  } else {
-    if (state.currentFaction === FACTIONS.PLANT) {
-      statusText = "🌻 PLANTS' TURN";
-      statusModifierClass = "turn-indicator-banner--plant";
-    } else {
-      statusText = "🧟 ZOMBIES' TURN";
-      statusModifierClass = "turn-indicator-banner--zombie";
-    }
   }
 
   return (
@@ -146,40 +117,20 @@ export default function Home() {
         <p className="game-subtitle">🌱 Plants vs Zombies 🧟</p>
 
         {/* Turn Indicator & Status Banner */}
-        <div className={`turn-indicator-banner ${statusModifierClass}`}>
-          <div className="turn-indicator-text">
-            {statusText}
-          </div>
-        </div>
+        <TurnIndicator
+          gameStatus={state.gameStatus}
+          currentFaction={state.currentFaction}
+          isAiTurn={isAiTurn}
+        />
 
         {/* 3×3 Board */}
-        <div className="board-wrapper">
-          {state.board.map((cell, index) => {
-            const isWinningCell = state.winningLine?.includes(index);
-            const isGameOver =
-              state.gameStatus === GAME_STATUS.PLANT_WINS ||
-              state.gameStatus === GAME_STATUS.ZOMBIE_WINS ||
-              state.gameStatus === GAME_STATUS.DRAW;
-
-            const isCellDisabled = cell !== null || isGameOver || isAiTurn;
-
-            return (
-              <button
-                key={index}
-                type="button"
-                className={`cell ${cell ? "cell--occupied" : ""} ${
-                  isWinningCell ? "cell--winning" : ""
-                } ${isCellDisabled ? "cell--disabled" : ""}`}
-                onClick={() => actions.makeMove(index)}
-                disabled={isCellDisabled}
-                aria-label={`Cell ${index + 1}: ${cell || "empty"}`}
-              >
-                {cell === FACTIONS.PLANT && <PlantSprite size={84} />}
-                {cell === FACTIONS.ZOMBIE && <ZombieSprite size={84} />}
-              </button>
-            );
-          })}
-        </div>
+        <Board
+          board={state.board}
+          winningLine={state.winningLine}
+          isGameOver={isGameOver}
+          isAiThinking={isAiTurn}
+          onCellClick={actions.makeMove}
+        />
 
         {/* Interactive Controls & Mode Selector */}
         <GameControls
@@ -201,6 +152,13 @@ export default function Home() {
         <Scoreboard
           scores={scores}
           onResetScores={handleResetScores}
+        />
+
+        {/* Result Overlay Celebration Modal */}
+        <ResultOverlay
+          key={state.matchId}
+          gameStatus={state.gameStatus}
+          onPlayAgain={() => actions.startNewGame()}
         />
       </div>
     </div>

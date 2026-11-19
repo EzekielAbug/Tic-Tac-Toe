@@ -13,8 +13,6 @@ export default function ZombieSprite({ size = 64, className = "" }) {
     <div
       className={`sprite-container sprite-zombie-wrapper ${className}`}
       style={{ width: size, height: size }}
-      role="img"
-      aria-label="Zombie character"
     >
       <Image
         src="/sprites/zombies/zombie.svg"

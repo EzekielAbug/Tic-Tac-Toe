@@ -693,6 +693,82 @@ html.night .score-card--zombie .score-faction-name {
 }
 
 /* ============================================================
+   Result Overlay Celebration Modal
+   ============================================================ */
+.result-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.result-overlay-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 24px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.4);
+}
+
+.result-icon {
+  font-size: 3rem;
+  margin-bottom: 8px;
+  filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.2));
+}
+
+.result-title {
+  font-size: 1.4rem;
+  margin: 0 0 10px 0;
+  letter-spacing: 1px;
+}
+
+.result-overlay--plant .result-title {
+  color: #2E7D32;
+}
+
+.result-overlay--zombie .result-title {
+  color: #7B1FA2;
+}
+
+.result-overlay--draw .result-title {
+  color: var(--text-primary);
+}
+
+.result-message {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  margin: 0 0 20px 0;
+  line-height: 1.6;
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================================
    Responsive
    ============================================================ */
 @media (max-width: 480px) {

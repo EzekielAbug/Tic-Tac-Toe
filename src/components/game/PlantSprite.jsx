@@ -9,8 +9,6 @@ export default function PlantSprite({ size = 64, className = "" }) {
     <div
       className={`sprite-container sprite-plant-wrapper ${className}`}
       style={{ width: size, height: size }}
-      role="img"
-      aria-label="Plant character"
     >
       <Image
         src="/sprites/plants/plant.svg"
