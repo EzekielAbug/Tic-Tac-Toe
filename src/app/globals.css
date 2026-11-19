@@ -12,7 +12,6 @@
    Tailwind Theme Tokens
    ============================================================ */
 @theme inline {
-  /* Fonts */
   --font-pixel: 'Press Start 2P', 'Courier New', monospace;
   --font-sans: 'Courier New', monospace;
 
@@ -38,50 +37,46 @@
 
 /* ============================================================
    Day Theme (default)
-   Applied via CSS custom properties on :root
    ============================================================ */
 :root {
   --sky-top: #87CEEB;
   --sky-bottom: #B0E0FF;
   --grass-light: #7EC850;
-  --grass-dark: #5DA038;
-  --grass-accent: #4A8A2C;
-  --grid-border: #5D4037;
-  --grid-border-light: #795548;
+  --grass-dark: #4A8A2C;
+  --grid-border: #4E342E;
+  --grid-border-light: #6D4C41;
   --cell-bg: #8FD060;
-  --cell-hover: #A0E070;
+  --cell-hover: #A2E86D;
   --text-primary: #2D1B0E;
   --text-secondary: #5D4037;
-  --panel-bg: #FFF8E7;
-  --panel-border: #D4A574;
-  --plant-accent: #4CAF50;
-  --zombie-accent: #9C27B0;
+  --panel-bg: #FFF9EE;
+  --panel-border: #C89965;
+  --plant-accent: #2E7D32;
+  --zombie-accent: #7B1FA2;
   --celestial-color: #FFD93D;
   --celestial-glow: #FFF176;
 }
 
 /* ============================================================
    Night Theme
-   Activated by adding class="night" to <html>
    ============================================================ */
 html.night {
-  --sky-top: #0D1B2A;
-  --sky-bottom: #1B2838;
-  --grass-light: #2D5A27;
-  --grass-dark: #1E3D1A;
-  --grass-accent: #163014;
-  --grid-border: #3E2723;
-  --grid-border-light: #4E342E;
-  --cell-bg: #2D6A30;
-  --cell-hover: #3D7A40;
-  --text-primary: #E8D5B7;
-  --text-secondary: #B8A08A;
-  --panel-bg: #1A1A2E;
-  --panel-border: #3A3A5E;
+  --sky-top: #0A1128;
+  --sky-bottom: #1C2541;
+  --grass-light: #254B22;
+  --grass-dark: #142812;
+  --grid-border: #2D1E18;
+  --grid-border-light: #3E2B24;
+  --cell-bg: #2B5729;
+  --cell-hover: #386E35;
+  --text-primary: #F1E3D3;
+  --text-secondary: #BCAAA4;
+  --panel-bg: #1A1F36;
+  --panel-border: #3A4568;
   --plant-accent: #66BB6A;
-  --zombie-accent: #CE93D8;
-  --celestial-color: #E8E8D0;
-  --celestial-glow: #D4D4B8;
+  --zombie-accent: #BA68C8;
+  --celestial-color: #F4F1DE;
+  --celestial-glow: #E0DDC3;
 }
 
 /* ============================================================
@@ -91,6 +86,7 @@ html.night {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+  box-sizing: border-box;
 }
 
 html {
@@ -102,17 +98,14 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  font-family: 'Courier New', monospace;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
   background: var(--sky-top);
   color: var(--text-primary);
   overflow-x: hidden;
 }
 
-/* ============================================================
-   Pixel-Art Typography
-   ============================================================ */
 .font-pixel {
-  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-family: 'Press Start 2P', monospace;
 }
 
 /* ============================================================
@@ -123,8 +116,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   min-height: 100vh;
   width: 100%;
+  padding-bottom: 40px;
 }
 
 /* Sky gradient background */
@@ -135,45 +130,44 @@ body {
   background: linear-gradient(
     180deg,
     var(--sky-top) 0%,
-    var(--sky-bottom) 60%,
-    var(--grass-light) 60%,
+    var(--sky-bottom) 52%,
+    var(--grass-light) 52%,
     var(--grass-dark) 100%
   );
   transition: background 0.5s ease;
 }
 
-/* Sun (day) or Moon (night) */
+/* Celestial body: Sun or Moon */
 .celestial-body {
   position: fixed;
-  top: 30px;
-  right: 40px;
-  width: 60px;
-  height: 60px;
+  top: 36px;
+  right: 50px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   background: var(--celestial-color);
   box-shadow:
-    0 0 20px var(--celestial-glow),
-    0 0 60px var(--celestial-glow);
+    0 0 25px var(--celestial-glow),
+    0 0 65px var(--celestial-glow);
   z-index: 1;
   transition: all 0.5s ease;
 }
 
-/* Night moon craters */
 html.night .celestial-body::after {
   content: '';
   position: absolute;
-  top: 12px;
-  left: 18px;
-  width: 10px;
-  height: 10px;
+  top: 15px;
+  left: 22px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.12);
   box-shadow:
-    15px 8px 0 4px rgba(0, 0, 0, 0.08),
-    -5px 20px 0 2px rgba(0, 0, 0, 0.06);
+    18px 10px 0 5px rgba(0, 0, 0, 0.08),
+    -6px 24px 0 3px rgba(0, 0, 0, 0.07);
 }
 
-/* Stars (visible only at night) */
+/* Stars at night */
 .stars {
   position: fixed;
   inset: 0;
@@ -211,7 +205,7 @@ html.night .stars {
 }
 
 /* ============================================================
-   Game Content (above sky)
+   Game Content Area
    ============================================================ */
 .game-content {
   position: relative;
@@ -220,71 +214,145 @@ html.night .stars {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 800px;
-  padding: 20px 16px;
+  max-width: 520px;
+  padding: 28px 16px;
   margin: 0 auto;
 }
 
 /* ============================================================
-   Title / Logo
+   Game Title & Header
    ============================================================ */
 .game-title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 1.5rem;
+  font-size: 2rem;
   text-align: center;
   color: var(--text-primary);
   text-shadow:
-    3px 3px 0px var(--grid-border),
-    -1px -1px 0px rgba(255, 255, 255, 0.3);
-  margin-bottom: 8px;
-  line-height: 1.6;
+    4px 4px 0px var(--grid-border),
+    -1px -1px 0px rgba(255, 255, 255, 0.4);
+  margin: 0 0 8px 0;
+  line-height: 1.3;
 }
 
 .game-title .title-plant {
-  color: var(--plant-accent);
+  color: #388E3C;
 }
 
 .game-title .title-zombie {
-  color: var(--zombie-accent);
+  color: #8E24AA;
 }
 
 .game-subtitle {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.5rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   text-align: center;
-  margin-bottom: 24px;
-  letter-spacing: 2px;
+  margin: 0 0 20px 0;
+  letter-spacing: 1px;
 }
 
 /* ============================================================
-   Board
+   Turn Indicator & Status Banner
+   ============================================================ */
+.turn-indicator-banner {
+  background: var(--panel-bg);
+  border: 4px solid var(--grid-border);
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.turn-indicator-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.turn-indicator-banner--plant {
+  border-color: #2E7D32;
+  background: #E8F5E9;
+  box-shadow: 5px 5px 0px rgba(46, 125, 50, 0.35);
+}
+
+html.night .turn-indicator-banner--plant {
+  background: #1B351E;
+}
+
+.turn-indicator-banner--plant .turn-indicator-text {
+  color: #2E7D32;
+}
+
+html.night .turn-indicator-banner--plant .turn-indicator-text {
+  color: #81C784;
+}
+
+.turn-indicator-banner--zombie {
+  border-color: #6A1B9A;
+  background: #F3E5F5;
+  box-shadow: 5px 5px 0px rgba(106, 27, 154, 0.35);
+}
+
+html.night .turn-indicator-banner--zombie {
+  background: #311B40;
+}
+
+.turn-indicator-banner--zombie .turn-indicator-text {
+  color: #6A1B9A;
+}
+
+html.night .turn-indicator-banner--zombie .turn-indicator-text {
+  color: #CE93D8;
+}
+
+.turn-indicator-banner--win {
+  animation: bannerWinGlow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes bannerWinGlow {
+  0% { transform: scale(1); box-shadow: 0 0 12px var(--celestial-glow); }
+  100% { transform: scale(1.03); box-shadow: 0 0 28px var(--celestial-glow); }
+}
+
+/* ============================================================
+   3×3 Garden Board
    ============================================================ */
 .board-wrapper {
   background: var(--grid-border);
-  border: 6px solid var(--grid-border);
-  border-radius: 4px;
+  border: 8px solid var(--grid-border);
+  border-radius: 6px;
   box-shadow:
-    6px 6px 0px rgba(0, 0, 0, 0.3),
-    inset 0 0 0 2px var(--grid-border-light);
+    8px 8px 0px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 3px var(--grid-border-light);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  padding: 6px;
+  gap: 8px;
+  padding: 8px;
+  width: 100%;
+  max-width: 440px;
 }
 
 .cell {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 120px;
   background: var(--cell-bg);
-  border: 3px solid var(--grid-border-light);
-  border-radius: 2px;
+  border: 4px solid var(--grid-border-light);
+  border-radius: 4px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.15s ease, transform 0.1s ease;
   position: relative;
+  padding: 0;
 }
 
 .cell:hover:not(.cell--occupied):not(.cell--disabled) {
@@ -302,28 +370,29 @@ html.night .stars {
 
 .cell--disabled {
   cursor: default;
-  opacity: 0.9;
 }
 
 .cell--winning {
-  animation: cellWin 0.6s ease-in-out infinite alternate;
+  animation: cellWinGlow 0.6s ease-in-out infinite alternate;
 }
 
-@keyframes cellWin {
-  0% { background: var(--cell-bg); }
-  100% { background: var(--celestial-color); border-color: var(--celestial-color); }
+@keyframes cellWinGlow {
+  0% { background: var(--cell-bg); border-color: var(--grid-border-light); }
+  100% { background: #FFE082; border-color: #FFB300; }
 }
 
 /* ============================================================
-   Pixel-Art Character Sprites
+   Pixel Sprites
    ============================================================ */
 .sprite-container {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  width: 80%;
+  height: 80%;
   animation: spritePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.35));
   user-select: none;
 }
 
@@ -343,137 +412,96 @@ html.night .stars {
 }
 
 /* ============================================================
-   Panel (for scoreboard, controls, etc.)
+   Pixel Buttons & Controls Bar
    ============================================================ */
-.pixel-panel {
-  background: var(--panel-bg);
-  border: 4px solid var(--panel-border);
-  border-radius: 2px;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-  padding: 12px 16px;
+.controls-bar {
+  display: flex;
+  gap: 14px;
+  margin-top: 22px;
+  width: 100%;
+  max-width: 440px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-/* ============================================================
-   Pixel Button
-   ============================================================ */
 .pixel-btn {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
-  padding: 10px 16px;
+  font-size: 0.75rem;
+  padding: 12px 18px;
   border: 4px solid var(--grid-border);
-  border-radius: 2px;
+  border-radius: 4px;
   background: var(--panel-bg);
   color: var(--text-primary);
   cursor: pointer;
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
   transition: all 0.1s ease;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
-.pixel-btn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
+.pixel-btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.3);
 }
 
-.pixel-btn:active {
+.pixel-btn:active:not(:disabled) {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
 }
 
+.pixel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .pixel-btn--plant {
-  background: var(--plant-accent);
+  background: #4CAF50;
   color: white;
   border-color: #2E7D32;
 }
 
-.pixel-btn--zombie {
-  background: var(--zombie-accent);
-  color: white;
-  border-color: #6A1B9A;
+.pixel-btn--plant:hover:not(:disabled) {
+  background: #43A047;
 }
 
 .pixel-btn--small {
-  font-size: 0.6rem;
-  padding: 8px 12px;
+  font-size: 0.65rem;
+  padding: 8px 14px;
   border-width: 3px;
   box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
 }
 
 .pixel-btn--confirm-yes {
-  background: #d32f2f;
+  background: #E53935;
   color: white;
-  border-color: #8b0000;
+  border-color: #B71C1C;
 }
 
 /* ============================================================
-   Turn Indicator & Status Banner
-   ============================================================ */
-.turn-indicator-banner {
-  background: var(--panel-bg);
-  border: 4px solid var(--grid-border);
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.25);
-  border-radius: 2px;
-  padding: 12px 20px;
-  margin: 12px 0 18px 0;
-  width: 100%;
-  max-width: 380px;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.turn-indicator-text {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  letter-spacing: 0.5px;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.turn-indicator-banner--plant {
-  border-color: #2E7D32;
-  box-shadow: 4px 4px 0px rgba(46, 125, 50, 0.4);
-}
-
-.turn-indicator-banner--zombie {
-  border-color: #6A1B9A;
-  box-shadow: 4px 4px 0px rgba(106, 27, 154, 0.4);
-}
-
-.turn-indicator-banner--win {
-  animation: bannerGlow 1s ease-in-out infinite alternate;
-}
-
-@keyframes bannerGlow {
-  0% { transform: scale(1); box-shadow: 0 0 10px var(--celestial-glow); }
-  100% { transform: scale(1.03); box-shadow: 0 0 24px var(--celestial-glow); }
-}
-
-/* ============================================================
-   Scoreboard Panel
+   Scoreboard Component
    ============================================================ */
 .scoreboard-panel {
+  background: var(--panel-bg);
+  border: 5px solid var(--panel-border);
+  border-radius: 4px;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.25);
   width: 100%;
-  max-width: 380px;
-  margin-top: 22px;
-  padding: 14px 16px;
+  max-width: 440px;
+  margin-top: 24px;
+  padding: 16px 18px;
 }
 
 .scoreboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 2px dashed var(--panel-border);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 3px dashed var(--panel-border);
 }
 
 .scoreboard-title {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-primary);
   margin: 0;
   letter-spacing: 1px;
@@ -482,18 +510,19 @@ html.night .stars {
 .scoreboard-confirm-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .scoreboard-confirm-text {
-  font-size: 0.5rem;
-  color: #d32f2f;
+  font-size: 0.55rem;
+  color: #D32F2F;
 }
 
 .scoreboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
+  width: 100%;
 }
 
 .score-card {
@@ -501,24 +530,26 @@ html.night .stars {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 6px;
-  border: 3px solid var(--panel-border);
-  border-radius: 2px;
+  padding: 12px 8px;
+  border: 4px solid var(--panel-border);
+  border-radius: 4px;
   background: rgba(0, 0, 0, 0.04);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.15);
-  transition: transform 0.1s ease;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
 html.night .score-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .score-card--plant {
-  border-color: var(--plant-accent);
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
 }
 
 .score-card--zombie {
-  border-color: var(--zombie-accent);
+  border-color: #AB47BC;
+  background: rgba(171, 71, 188, 0.1);
 }
 
 .score-card--draw {
@@ -526,16 +557,25 @@ html.night .score-card {
 }
 
 .score-faction-name {
-  font-size: 0.55rem;
-  margin-bottom: 4px;
+  font-size: 0.6rem;
+  margin-bottom: 6px;
+  white-space: nowrap;
 }
 
 .score-card--plant .score-faction-name {
-  color: var(--plant-accent);
+  color: #2E7D32;
+}
+
+html.night .score-card--plant .score-faction-name {
+  color: #81C784;
 }
 
 .score-card--zombie .score-faction-name {
-  color: var(--zombie-accent);
+  color: #7B1FA2;
+}
+
+html.night .score-card--zombie .score-faction-name {
+  color: #CE93D8;
 }
 
 .score-card--draw .score-faction-name {
@@ -543,14 +583,15 @@ html.night .score-card {
 }
 
 .score-number {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: bold;
   color: var(--text-primary);
-  margin: 2px 0;
+  margin: 4px 0;
+  line-height: 1;
 }
 
 .score-label {
-  font-size: 0.45rem;
+  font-size: 0.5rem;
   color: var(--text-secondary);
   letter-spacing: 0.5px;
 }
@@ -559,28 +600,33 @@ html.night .score-card {
    Responsive
    ============================================================ */
 @media (max-width: 480px) {
-  .cell {
-    width: 80px;
-    height: 80px;
-  }
-
-  .sprite-plant,
-  .sprite-zombie {
-    width: 44px;
-    height: 44px;
-  }
-
   .game-title {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
   }
 
   .game-subtitle {
-    font-size: 0.4rem;
+    font-size: 0.55rem;
+  }
+
+  .turn-indicator-text {
+    font-size: 0.8rem;
+  }
+
+  .cell {
+    min-height: 95px;
+  }
+
+  .score-number {
+    font-size: 1.3rem;
+  }
+
+  .score-faction-name {
+    font-size: 0.48rem;
   }
 
   .celestial-body {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     top: 16px;
     right: 16px;
   }

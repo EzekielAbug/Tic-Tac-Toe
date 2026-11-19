@@ -131,23 +131,15 @@ export default function Home() {
                 disabled={cell !== null || isGameOver}
                 aria-label={`Cell ${index + 1}: ${cell || "empty"}`}
               >
-                {cell === FACTIONS.PLANT && <PlantSprite size={68} />}
-                {cell === FACTIONS.ZOMBIE && <ZombieSprite size={68} />}
+                {cell === FACTIONS.PLANT && <PlantSprite size={84} />}
+                {cell === FACTIONS.ZOMBIE && <ZombieSprite size={84} />}
               </button>
             );
           })}
         </div>
 
         {/* Game Controls */}
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            marginTop: "20px",
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
+        <div className="controls-bar">
           <button
             type="button"
             className="pixel-btn"
@@ -167,10 +159,6 @@ export default function Home() {
             className="pixel-btn pixel-btn--small"
             onClick={() => actions.undoMove()}
             disabled={state.moveHistory.length === 0}
-            style={{
-              opacity: state.moveHistory.length === 0 ? 0.5 : 1,
-              cursor: state.moveHistory.length === 0 ? "not-allowed" : "pointer",
-            }}
           >
             ↩ Undo
           </button>
