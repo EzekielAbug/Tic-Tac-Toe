@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import PlantSprite from "@/components/game/PlantSprite";
+import ZombieSprite from "@/components/game/ZombieSprite";
 
 /**
  * Garden Clash — Main Page
  *
- * Phase 1: Displays the garden scene layout shell with:
+ * Displays the garden scene layout shell with:
  * - Sky gradient (day/night)
  * - Celestial body (sun/moon)
  * - Stars (visible at night)
  * - Game title
- * - 3×3 board with CSS placeholder sprites
+ * - 3×3 board with authentic pixel-art Plant & Zombie sprites
  * - Theme toggle button
  *
  * Game logic will be connected in Phase 4.
@@ -83,8 +85,8 @@ export default function Home() {
               key={index}
               className={`cell ${cell ? "cell--occupied" : ""}`}
             >
-              {cell === "PLANT" && <div className="sprite-plant" />}
-              {cell === "ZOMBIE" && <div className="sprite-zombie" />}
+              {cell === "PLANT" && <PlantSprite size={68} />}
+              {cell === "ZOMBIE" && <ZombieSprite size={68} />}
             </div>
           ))}
         </div>
