@@ -1,25 +1,35 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Board from "@/components/game/Board";
 import TurnIndicator from "@/components/game/TurnIndicator";
 import ResultOverlay from "@/components/game/ResultOverlay";
 import GameControls from "@/components/game/GameControls";
 import Scoreboard from "@/components/scoreboard/Scoreboard";
+import MatchHistory from "@/components/history/MatchHistory";
 import { useGameReducer } from "@/hooks/useGameReducer";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useAudio } from "@/hooks/useAudio";
 import { getAiMove } from "@/lib/game/ai";
-import { GAME_STATUS, GAME_MODES } from "@/constants/game";
+import { FACTIONS, GAME_STATUS, GAME_MODES } from "@/constants/game";
 import { STORAGE_KEYS, DEFAULT_SCORES } from "@/lib/storage/localStorage";
 
 /**
  * Garden Clash — Main Application Page
- * Composes the game components cleanly: Board, TurnIndicator, ResultOverlay, Controls, Scoreboard.
+ *
+ * Full integration of:
+ * - Game Engine & Reducer (PvP & PvE)
+ * - Sound System (Procedural Web Audio)
+ * - Scoreboard (Persistent)
+ * - Match History (Persistent)
+ * - Day/Night Themes
  */
 export default function Home() {
   const [isNight, setIsNight] = useState(false);
   const { state, actions } = useGameReducer();
   const [scores, setScores] = useLocalStorage(STORAGE_KEYS.SCORES, DEFAULT_SCORES);
+  const [history, setHistory] = useLocalStorage(STORAGE_KEYS.HISTORY, []);
+  const audio = useAudio();
 
   const isGameOver =
     state.gameStatus === GAME_STATUS.PLANT_WINS ||
@@ -41,8 +51,31 @@ export default function Home() {
   }
 
   /**
+   * Sound-enhanced move action
+   */
+  const handleCellClick = useCallback(
+    (cellIndex) => {
+      if (state.currentFaction === FACTIONS.PLANT) {
+        audio.playPlant();
+      } else {
+        audio.playZombie();
+      }
+      actions.makeMove(cellIndex);
+    },
+    [state.currentFaction, audio, actions]
+  );
+
+  /**
+   * Sound-enhanced undo action
+   */
+  const handleUndo = useCallback(() => {
+    audio.playUndo();
+    actions.undoMove();
+  }, [audio, actions]);
+
+  /**
    * PvE AI Response Effect
-   * Schedules the computer's move after a natural thinking delay.
+   * Schedules the computer's move after a natural thinking delay and plays sound.
    */
   useEffect(() => {
     if (!isAiTurn) return;
@@ -54,35 +87,95 @@ export default function Home() {
         state.currentFaction
       );
       if (move !== null) {
+        if (state.currentFaction === FACTIONS.PLANT) {
+          audio.playPlant();
+        } else {
+          audio.playZombie();
+        }
         actions.makeMove(move);
       }
     }, 420);
 
     return () => clearTimeout(timer);
-  }, [isAiTurn, state.board, state.aiDifficulty, state.currentFaction, actions]);
+  }, [
+    isAiTurn,
+    state.board,
+    state.aiDifficulty,
+    state.currentFaction,
+    audio,
+    actions,
+  ]);
 
   /**
-   * Listen for terminal game conditions and record scores.
+   * Listen for terminal game conditions, trigger sounds, and record match data.
    * Guarded by state.matchRecorded to prevent duplicate counting.
    */
   useEffect(() => {
     if (state.matchRecorded) return;
 
     if (state.gameStatus === GAME_STATUS.PLANT_WINS) {
+      audio.playWin();
       setScores((prev) => ({ ...prev, plantWins: prev.plantWins + 1 }));
+      setHistory((prev) => [
+        {
+          id: state.matchId,
+          winner: FACTIONS.PLANT,
+          mode: state.gameMode,
+          difficulty: state.gameMode === GAME_MODES.PVE ? state.aiDifficulty : null,
+          timestamp: new Date().toISOString(),
+        },
+        ...(Array.isArray(prev) ? prev : []),
+      ].slice(0, 50));
       actions.recordMatch();
     } else if (state.gameStatus === GAME_STATUS.ZOMBIE_WINS) {
+      audio.playWin();
       setScores((prev) => ({ ...prev, zombieWins: prev.zombieWins + 1 }));
+      setHistory((prev) => [
+        {
+          id: state.matchId,
+          winner: FACTIONS.ZOMBIE,
+          mode: state.gameMode,
+          difficulty: state.gameMode === GAME_MODES.PVE ? state.aiDifficulty : null,
+          timestamp: new Date().toISOString(),
+        },
+        ...(Array.isArray(prev) ? prev : []),
+      ].slice(0, 50));
       actions.recordMatch();
     } else if (state.gameStatus === GAME_STATUS.DRAW) {
+      audio.playDraw();
       setScores((prev) => ({ ...prev, draws: prev.draws + 1 }));
+      setHistory((prev) => [
+        {
+          id: state.matchId,
+          winner: null,
+          mode: state.gameMode,
+          difficulty: state.gameMode === GAME_MODES.PVE ? state.aiDifficulty : null,
+          timestamp: new Date().toISOString(),
+        },
+        ...(Array.isArray(prev) ? prev : []),
+      ].slice(0, 50));
       actions.recordMatch();
     }
-  }, [state.gameStatus, state.matchRecorded, setScores, actions]);
+  }, [
+    state.gameStatus,
+    state.matchRecorded,
+    state.matchId,
+    state.gameMode,
+    state.aiDifficulty,
+    audio,
+    setScores,
+    setHistory,
+    actions,
+  ]);
 
   /** Reset all scores */
   function handleResetScores() {
     setScores(DEFAULT_SCORES);
+  }
+
+  /** Clear completed match history */
+  function handleClearHistory() {
+    setHistory([]);
   }
 
   return (
@@ -129,7 +222,7 @@ export default function Home() {
           winningLine={state.winningLine}
           isGameOver={isGameOver}
           isAiThinking={isAiTurn}
-          onCellClick={actions.makeMove}
+          onCellClick={handleCellClick}
         />
 
         {/* Interactive Controls & Mode Selector */}
@@ -143,15 +236,23 @@ export default function Home() {
           onSetAiDifficulty={actions.setAiDifficulty}
           onSetHumanFaction={actions.setHumanFaction}
           onNewGame={() => actions.startNewGame()}
-          onUndo={actions.undoMove}
+          onUndo={handleUndo}
           isNight={isNight}
           onToggleTheme={handleThemeToggle}
+          isSoundEnabled={audio.isSoundEnabled}
+          onToggleSound={audio.toggleSound}
         />
 
         {/* Scoreboard */}
         <Scoreboard
           scores={scores}
           onResetScores={handleResetScores}
+        />
+
+        {/* Match History */}
+        <MatchHistory
+          history={history}
+          onClearHistory={handleClearHistory}
         />
 
         {/* Result Overlay Celebration Modal */}

@@ -37,6 +37,8 @@ export default function GameControls({
   onUndo,
   isNight,
   onToggleTheme,
+  isSoundEnabled = true,
+  onToggleSound,
 }) {
   return (
     <div className="game-controls-container">
@@ -49,6 +51,17 @@ export default function GameControls({
         >
           {isNight ? "☀️ Day" : "🌙 Night"}
         </button>
+        {onToggleSound && (
+          <button
+            type="button"
+            className="pixel-btn pixel-btn--small"
+            onClick={onToggleSound}
+            aria-label="Toggle Sound"
+            title="Toggle Sound Effects"
+          >
+            {isSoundEnabled ? "🔊 Sound" : "🔇 Muted"}
+          </button>
+        )}
         <button
           type="button"
           className="pixel-btn pixel-btn--plant"

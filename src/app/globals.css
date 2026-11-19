@@ -769,6 +769,114 @@ html.night .score-card--zombie .score-faction-name {
 }
 
 /* ============================================================
+   Match History Component
+   ============================================================ */
+.history-panel {
+  width: 100%;
+  max-width: 440px;
+  margin-top: 16px;
+  padding: 14px 16px;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.history-toggle-btn:hover {
+  color: var(--plant-accent);
+}
+
+.history-body {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px dashed var(--panel-border);
+}
+
+.history-empty {
+  font-size: 0.55rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 12px 0;
+  line-height: 1.8;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 2px solid var(--panel-border);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.03);
+  font-size: 0.52rem;
+}
+
+html.night .history-item {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.history-badge {
+  font-size: 0.52rem;
+  padding: 4px 6px;
+  border-radius: 2px;
+}
+
+.history-badge--plant {
+  background: rgba(76, 175, 80, 0.2);
+  color: #2E7D32;
+}
+
+html.night .history-badge--plant {
+  color: #81C784;
+}
+
+.history-badge--zombie {
+  background: rgba(171, 71, 188, 0.2);
+  color: #7B1FA2;
+}
+
+html.night .history-badge--zombie {
+  color: #CE93D8;
+}
+
+.history-badge--draw {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-secondary);
+}
+
+.history-mode {
+  color: var(--text-secondary);
+  font-size: 0.48rem;
+}
+
+.history-time {
+  color: var(--text-secondary);
+  font-size: 0.45rem;
+}
+
+/* ============================================================
    Responsive
    ============================================================ */
 @media (max-width: 480px) {
