@@ -45,7 +45,7 @@ export function createInitialState(overrides = {}) {
     aiDifficulty: AI_DIFFICULTY.EASY,
     humanFaction: FACTIONS.PLANT,
     moveHistory: [],
-    matchId: overrides.matchId || `match_${Date.now()}`,
+    matchId: overrides.matchId || 'match_initial',
     matchRecorded: false,
     winningLine: null,
     ...overrides,
@@ -64,7 +64,7 @@ export function gameReducer(state, action) {
       const mode = action.payload?.gameMode ?? state.gameMode;
       const difficulty = action.payload?.aiDifficulty ?? state.aiDifficulty;
       const human = action.payload?.humanFaction ?? state.humanFaction;
-      const matchId = action.payload?.matchId ?? `match_${Date.now()}`;
+      const matchId = action.payload?.matchId ?? `match_${state.moveHistory.length + 1}`;
 
       return {
         ...state,

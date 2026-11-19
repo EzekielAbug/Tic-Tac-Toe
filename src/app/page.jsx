@@ -1,24 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PlantSprite from "@/components/game/PlantSprite";
 import ZombieSprite from "@/components/game/ZombieSprite";
+import Scoreboard from "@/components/scoreboard/Scoreboard";
+import { useGameReducer } from "@/hooks/useGameReducer";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { FACTIONS, GAME_STATUS } from "@/constants/game";
+import { STORAGE_KEYS, DEFAULT_SCORES } from "@/lib/storage/localStorage";
 
 /**
- * Garden Clash — Main Page
- *
- * Displays the garden scene layout shell with:
- * - Sky gradient (day/night)
- * - Celestial body (sun/moon)
- * - Stars (visible at night)
- * - Game title
- * - 3×3 board with authentic pixel-art Plant & Zombie sprites
- * - Theme toggle button
- *
- * Game logic will be connected in Phase 4.
+ * Garden Clash — Main Application Page
  */
 export default function Home() {
   const [isNight, setIsNight] = useState(false);
+  const { state, actions } = useGameReducer();
+  const [scores, setScores] = useLocalStorage(STORAGE_KEYS.SCORES, DEFAULT_SCORES);
 
   /** Toggle the theme class on the <html> element */
   function handleThemeToggle() {
@@ -29,18 +26,52 @@ export default function Home() {
     });
   }
 
-  // Demo board: show some placeholder sprites to verify styling
-  const demoBoard = [
-    "PLANT",
-    null,
-    "ZOMBIE",
-    null,
-    "PLANT",
-    null,
-    "ZOMBIE",
-    null,
-    null,
-  ];
+  /**
+   * Listen for terminal game conditions and record scores.
+   * Guarded by state.matchRecorded to prevent duplicate counting.
+   */
+  useEffect(() => {
+    if (state.matchRecorded) return;
+
+    if (state.gameStatus === GAME_STATUS.PLANT_WINS) {
+      setScores((prev) => ({ ...prev, plantWins: prev.plantWins + 1 }));
+      actions.recordMatch();
+    } else if (state.gameStatus === GAME_STATUS.ZOMBIE_WINS) {
+      setScores((prev) => ({ ...prev, zombieWins: prev.zombieWins + 1 }));
+      actions.recordMatch();
+    } else if (state.gameStatus === GAME_STATUS.DRAW) {
+      setScores((prev) => ({ ...prev, draws: prev.draws + 1 }));
+      actions.recordMatch();
+    }
+  }, [state.gameStatus, state.matchRecorded, setScores, actions]);
+
+  /** Reset all scores */
+  function handleResetScores() {
+    setScores(DEFAULT_SCORES);
+  }
+
+  // Format turn indicator & status banner text
+  let statusText = "";
+  let statusModifierClass = "";
+
+  if (state.gameStatus === GAME_STATUS.PLANT_WINS) {
+    statusText = "🌻 PLANTS WIN! 🎉";
+    statusModifierClass = "turn-indicator-banner--plant turn-indicator-banner--win";
+  } else if (state.gameStatus === GAME_STATUS.ZOMBIE_WINS) {
+    statusText = "🧟 ZOMBIES WIN! 🧠";
+    statusModifierClass = "turn-indicator-banner--zombie turn-indicator-banner--win";
+  } else if (state.gameStatus === GAME_STATUS.DRAW) {
+    statusText = "🤝 IT'S A DRAW!";
+    statusModifierClass = "turn-indicator-banner--win";
+  } else {
+    if (state.currentFaction === FACTIONS.PLANT) {
+      statusText = "🌻 PLANTS' TURN";
+      statusModifierClass = "turn-indicator-banner--plant";
+    } else {
+      statusText = "🧟 ZOMBIES' TURN";
+      statusModifierClass = "turn-indicator-banner--zombie";
+    }
+  }
 
   return (
     <div className="garden-scene">
@@ -64,7 +95,7 @@ export default function Home() {
         <div className="star" />
       </div>
 
-      {/* Game content */}
+      {/* Main Game Container */}
       <div className="game-content">
         {/* Title */}
         <h1 className="game-title">
@@ -73,25 +104,41 @@ export default function Home() {
         </h1>
         <p className="game-subtitle">🌱 Plants vs Zombies 🧟</p>
 
-        {/* Turn indicator placeholder */}
-        <div className="turn-indicator">
-          🌻 Plants&apos; Turn
+        {/* Turn Indicator & Status Banner */}
+        <div className={`turn-indicator-banner ${statusModifierClass}`}>
+          <div className="turn-indicator-text">
+            {statusText}
+          </div>
         </div>
 
-        {/* Board */}
+        {/* 3×3 Board */}
         <div className="board-wrapper">
-          {demoBoard.map((cell, index) => (
-            <div
-              key={index}
-              className={`cell ${cell ? "cell--occupied" : ""}`}
-            >
-              {cell === "PLANT" && <PlantSprite size={68} />}
-              {cell === "ZOMBIE" && <ZombieSprite size={68} />}
-            </div>
-          ))}
+          {state.board.map((cell, index) => {
+            const isWinningCell = state.winningLine?.includes(index);
+            const isGameOver =
+              state.gameStatus === GAME_STATUS.PLANT_WINS ||
+              state.gameStatus === GAME_STATUS.ZOMBIE_WINS ||
+              state.gameStatus === GAME_STATUS.DRAW;
+
+            return (
+              <button
+                key={index}
+                type="button"
+                className={`cell ${cell ? "cell--occupied" : ""} ${
+                  isWinningCell ? "cell--winning" : ""
+                } ${isGameOver ? "cell--disabled" : ""}`}
+                onClick={() => actions.makeMove(index)}
+                disabled={cell !== null || isGameOver}
+                aria-label={`Cell ${index + 1}: ${cell || "empty"}`}
+              >
+                {cell === FACTIONS.PLANT && <PlantSprite size={68} />}
+                {cell === FACTIONS.ZOMBIE && <ZombieSprite size={68} />}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Controls placeholder */}
+        {/* Game Controls */}
         <div
           style={{
             display: "flex",
@@ -102,27 +149,38 @@ export default function Home() {
           }}
         >
           <button
+            type="button"
             className="pixel-btn"
             onClick={handleThemeToggle}
           >
             {isNight ? "☀️ Day" : "🌙 Night"}
           </button>
-          <button className="pixel-btn pixel-btn--plant">New Game</button>
-          <button className="pixel-btn pixel-btn--small">↩ Undo</button>
-          <button className="pixel-btn pixel-btn--small">🔊 Sound</button>
+          <button
+            type="button"
+            className="pixel-btn pixel-btn--plant"
+            onClick={() => actions.startNewGame()}
+          >
+            New Game
+          </button>
+          <button
+            type="button"
+            className="pixel-btn pixel-btn--small"
+            onClick={() => actions.undoMove()}
+            disabled={state.moveHistory.length === 0}
+            style={{
+              opacity: state.moveHistory.length === 0 ? 0.5 : 1,
+              cursor: state.moveHistory.length === 0 ? "not-allowed" : "pointer",
+            }}
+          >
+            ↩ Undo
+          </button>
         </div>
 
-        {/* Score panel placeholder */}
-        <div className="pixel-panel" style={{ marginTop: "20px", width: "100%", maxWidth: "348px" }}>
-          <div className="font-pixel" style={{ fontSize: "0.55rem", textAlign: "center", marginBottom: "8px" }}>
-            Scoreboard
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "'Press Start 2P', monospace", fontSize: "0.5rem" }}>
-            <span style={{ color: "var(--plant-accent)" }}>🌻 Plants: 0</span>
-            <span>Draws: 0</span>
-            <span style={{ color: "var(--zombie-accent)" }}>🧟 Zombies: 0</span>
-          </div>
-        </div>
+        {/* Scoreboard */}
+        <Scoreboard
+          scores={scores}
+          onResetScores={handleResetScores}
+        />
       </div>
     </div>
   );

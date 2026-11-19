@@ -19,7 +19,8 @@ export function useGameReducer(initialConfig = {}) {
   );
 
   const startNewGame = useCallback((options = {}) => {
-    dispatch({ type: GAME_ACTIONS.NEW_GAME, payload: options });
+    const matchId = options.matchId || `match_${Date.now()}`;
+    dispatch({ type: GAME_ACTIONS.NEW_GAME, payload: { ...options, matchId } });
   }, []);
 
   const makeMove = useCallback((cellIndex) => {
