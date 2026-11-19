@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import Board from "@/components/game/Board";
 import TurnIndicator from "@/components/game/TurnIndicator";
 import ResultOverlay from "@/components/game/ResultOverlay";
 import GameControls from "@/components/game/GameControls";
 import Scoreboard from "@/components/scoreboard/Scoreboard";
 import MatchHistory from "@/components/history/MatchHistory";
+import GardenDecorations from "@/components/garden/GardenDecorations";
 import { useGameReducer } from "@/hooks/useGameReducer";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useAudio } from "@/hooks/useAudio";
+import { useTheme } from "@/hooks/useTheme";
 import { getAiMove } from "@/lib/game/ai";
 import { FACTIONS, GAME_STATUS, GAME_MODES } from "@/constants/game";
 import { STORAGE_KEYS, DEFAULT_SCORES } from "@/lib/storage/localStorage";
@@ -22,10 +24,11 @@ import { STORAGE_KEYS, DEFAULT_SCORES } from "@/lib/storage/localStorage";
  * - Sound System (Procedural Web Audio)
  * - Scoreboard (Persistent)
  * - Match History (Persistent)
- * - Day/Night Themes
+ * - Day/Night Themes (Persistent)
+ * - Environmental Decorations (Picket fence, fireflies, flowers)
  */
 export default function Home() {
-  const [isNight, setIsNight] = useState(false);
+  const theme = useTheme();
   const { state, actions } = useGameReducer();
   const [scores, setScores] = useLocalStorage(STORAGE_KEYS.SCORES, DEFAULT_SCORES);
   const [history, setHistory] = useLocalStorage(STORAGE_KEYS.HISTORY, []);
@@ -40,15 +43,6 @@ export default function Home() {
     state.gameMode === GAME_MODES.PVE &&
     !isGameOver &&
     state.currentFaction !== state.humanFaction;
-
-  /** Toggle the theme class on the <html> element */
-  function handleThemeToggle() {
-    setIsNight((prev) => {
-      const next = !prev;
-      document.documentElement.classList.toggle("night", next);
-      return next;
-    });
-  }
 
   /**
    * Sound-enhanced move action
@@ -186,6 +180,9 @@ export default function Home() {
       {/* Sun or Moon */}
       <div className="celestial-body" />
 
+      {/* Environmental Decorations: Picket fence, fireflies, flowers */}
+      <GardenDecorations isNight={theme.isNight} />
+
       {/* Stars (only visible at night) */}
       <div className="stars">
         <div className="star" style={{ top: "10%", left: "20%" }} />
@@ -237,8 +234,8 @@ export default function Home() {
           onSetHumanFaction={actions.setHumanFaction}
           onNewGame={() => actions.startNewGame()}
           onUndo={handleUndo}
-          isNight={isNight}
-          onToggleTheme={handleThemeToggle}
+          isNight={theme.isNight}
+          onToggleTheme={theme.toggleTheme}
           isSoundEnabled={audio.isSoundEnabled}
           onToggleSound={audio.toggleSound}
         />

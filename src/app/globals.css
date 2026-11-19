@@ -391,9 +391,14 @@ html.night .turn-indicator-banner--zombie .turn-indicator-text {
   position: relative;
   width: 80%;
   height: 80%;
-  animation: spritePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: spritePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), spriteIdleBob 2.5s ease-in-out infinite alternate 0.35s;
   filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.35));
   user-select: none;
+}
+
+@keyframes spriteIdleBob {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-4px); }
 }
 
 .pixel-sprite {
@@ -874,6 +879,103 @@ html.night .history-badge--zombie {
 .history-time {
   color: var(--text-secondary);
   font-size: 0.45rem;
+}
+
+/* ============================================================
+   Environmental Decorations & Fence
+   ============================================================ */
+.garden-decorations {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Pixel-art wooden picket fence along the 52% horizon line */
+.garden-fence {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 22px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--grid-border) 0px,
+    var(--grid-border) 16px,
+    transparent 16px,
+    transparent 22px
+  );
+  border-bottom: 4px solid var(--grid-border-light);
+  opacity: 0.6;
+}
+
+/* Animated Night Fireflies */
+.fireflies-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.firefly {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: #EEFF41;
+  border-radius: 50%;
+  box-shadow:
+    0 0 8px #C6FF00,
+    0 0 16px #AEEA00;
+  animation: fireflyDrift 4s ease-in-out infinite alternate;
+}
+
+@keyframes fireflyDrift {
+  0% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(14px, -18px) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-10px, -32px) scale(0.9);
+    opacity: 0.4;
+  }
+}
+
+/* Decorative lawn flowers along the bottom */
+.garden-lawn-flowers {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 0 40px;
+  opacity: 0.8;
+  font-size: 1.4rem;
+  user-select: none;
+}
+
+.lawn-flower {
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.25));
+  transition: transform 0.2s ease;
+}
+
+.lawn-flower:hover {
+  transform: scale(1.2) rotate(10deg);
+}
+
+/* ============================================================
+   Keyboard Accessibility & Focus States
+   ============================================================ */
+.cell:focus-visible,
+.pixel-btn:focus-visible,
+.pixel-pill:focus-visible,
+.history-toggle-btn:focus-visible {
+  outline: 4px dashed #FFD54F !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 10px rgba(255, 213, 79, 0.6) !important;
 }
 
 /* ============================================================
