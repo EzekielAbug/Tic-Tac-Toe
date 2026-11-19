@@ -1,0 +1,524 @@
+/* --- Google Font: Press Start 2P (pixel font) --- */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@import "tailwindcss";
+
+/* ============================================================
+   GARDEN CLASH — Global Styles
+   Pixel-art garden aesthetic with day/night theming
+   ============================================================ */
+
+/* ============================================================
+   Tailwind Theme Tokens
+   ============================================================ */
+@theme inline {
+  /* Fonts */
+  --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+  --font-sans: 'Courier New', monospace;
+
+  /* Day Theme Colors (default) */
+  --color-sky-top: #87CEEB;
+  --color-sky-bottom: #B0E0FF;
+  --color-grass-light: #7EC850;
+  --color-grass-dark: #5DA038;
+  --color-grass-accent: #4A8A2C;
+  --color-grid-border: #5D4037;
+  --color-grid-border-light: #795548;
+  --color-cell-bg: #8FD060;
+  --color-cell-hover: #A0E070;
+  --color-text-primary: #2D1B0E;
+  --color-text-secondary: #5D4037;
+  --color-panel-bg: #FFF8E7;
+  --color-panel-border: #D4A574;
+  --color-plant-accent: #4CAF50;
+  --color-zombie-accent: #9C27B0;
+  --color-sun: #FFD93D;
+  --color-sun-glow: #FFF176;
+}
+
+/* ============================================================
+   Day Theme (default)
+   Applied via CSS custom properties on :root
+   ============================================================ */
+:root {
+  --sky-top: #87CEEB;
+  --sky-bottom: #B0E0FF;
+  --grass-light: #7EC850;
+  --grass-dark: #5DA038;
+  --grass-accent: #4A8A2C;
+  --grid-border: #5D4037;
+  --grid-border-light: #795548;
+  --cell-bg: #8FD060;
+  --cell-hover: #A0E070;
+  --text-primary: #2D1B0E;
+  --text-secondary: #5D4037;
+  --panel-bg: #FFF8E7;
+  --panel-border: #D4A574;
+  --plant-accent: #4CAF50;
+  --zombie-accent: #9C27B0;
+  --celestial-color: #FFD93D;
+  --celestial-glow: #FFF176;
+}
+
+/* ============================================================
+   Night Theme
+   Activated by adding class="night" to <html>
+   ============================================================ */
+html.night {
+  --sky-top: #0D1B2A;
+  --sky-bottom: #1B2838;
+  --grass-light: #2D5A27;
+  --grass-dark: #1E3D1A;
+  --grass-accent: #163014;
+  --grid-border: #3E2723;
+  --grid-border-light: #4E342E;
+  --cell-bg: #2D6A30;
+  --cell-hover: #3D7A40;
+  --text-primary: #E8D5B7;
+  --text-secondary: #B8A08A;
+  --panel-bg: #1A1A2E;
+  --panel-border: #3A3A5E;
+  --plant-accent: #66BB6A;
+  --zombie-accent: #CE93D8;
+  --celestial-color: #E8E8D0;
+  --celestial-glow: #D4D4B8;
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+* {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Courier New', monospace;
+  background: var(--sky-top);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   Pixel-Art Typography
+   ============================================================ */
+.font-pixel {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+}
+
+/* ============================================================
+   Garden Scene Layout
+   ============================================================ */
+.garden-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Sky gradient background */
+.garden-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    var(--sky-top) 0%,
+    var(--sky-bottom) 60%,
+    var(--grass-light) 60%,
+    var(--grass-dark) 100%
+  );
+  transition: background 0.5s ease;
+}
+
+/* Sun (day) or Moon (night) */
+.celestial-body {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--celestial-color);
+  box-shadow:
+    0 0 20px var(--celestial-glow),
+    0 0 60px var(--celestial-glow);
+  z-index: 1;
+  transition: all 0.5s ease;
+}
+
+/* Night moon craters */
+html.night .celestial-body::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 18px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow:
+    15px 8px 0 4px rgba(0, 0, 0, 0.08),
+    -5px 20px 0 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Stars (visible only at night) */
+.stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+html.night .stars {
+  opacity: 1;
+}
+
+.star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #FFE082;
+  animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+.star:nth-child(2) { top: 8%; left: 15%; animation-delay: 0.3s; width: 3px; height: 3px; }
+.star:nth-child(3) { top: 15%; left: 45%; animation-delay: 0.7s; }
+.star:nth-child(4) { top: 5%; left: 70%; animation-delay: 1.1s; width: 3px; height: 3px; }
+.star:nth-child(5) { top: 20%; left: 85%; animation-delay: 0.5s; }
+.star:nth-child(6) { top: 12%; left: 30%; animation-delay: 1.5s; width: 2px; height: 2px; }
+.star:nth-child(7) { top: 3%; left: 55%; animation-delay: 0.9s; width: 3px; height: 3px; }
+.star:nth-child(8) { top: 25%; left: 10%; animation-delay: 1.3s; width: 2px; height: 2px; }
+.star:nth-child(9) { top: 18%; left: 65%; animation-delay: 0.2s; }
+.star:nth-child(10) { top: 8%; left: 90%; animation-delay: 1.7s; width: 2px; height: 2px; }
+
+@keyframes twinkle {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ============================================================
+   Game Content (above sky)
+   ============================================================ */
+.game-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  padding: 20px 16px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   Title / Logo
+   ============================================================ */
+.game-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--text-primary);
+  text-shadow:
+    3px 3px 0px var(--grid-border),
+    -1px -1px 0px rgba(255, 255, 255, 0.3);
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.game-title .title-plant {
+  color: var(--plant-accent);
+}
+
+.game-title .title-zombie {
+  color: var(--zombie-accent);
+}
+
+.game-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+}
+
+/* ============================================================
+   Board
+   ============================================================ */
+.board-wrapper {
+  background: var(--grid-border);
+  border: 6px solid var(--grid-border);
+  border-radius: 4px;
+  box-shadow:
+    6px 6px 0px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 2px var(--grid-border-light);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 6px;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background: var(--cell-bg);
+  border: 3px solid var(--grid-border-light);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.1s ease;
+  position: relative;
+}
+
+.cell:hover:not(.cell--occupied):not(.cell--disabled) {
+  background: var(--cell-hover);
+  transform: scale(1.03);
+}
+
+.cell:active:not(.cell--occupied):not(.cell--disabled) {
+  transform: scale(0.97);
+}
+
+.cell--occupied {
+  cursor: default;
+}
+
+.cell--disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.cell--winning {
+  animation: cellWin 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes cellWin {
+  0% { background: var(--cell-bg); }
+  100% { background: var(--celestial-color); border-color: var(--celestial-color); }
+}
+
+/* ============================================================
+   Pixel-Art Character Placeholders (CSS-drawn)
+   These will be replaced with proper sprites in Phase 4.
+   ============================================================ */
+.sprite-plant {
+  width: 56px;
+  height: 56px;
+  background: #4CAF50;
+  border: 4px solid #2E7D32;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: relative;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+  animation: spritePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Plant eyes */
+.sprite-plant::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 10px;
+  width: 8px;
+  height: 10px;
+  background: white;
+  border: 2px solid #1B5E20;
+  border-radius: 50%;
+  box-shadow: 18px 0 0 0 white, 18px 0 0 2px #1B5E20;
+}
+
+/* Plant mouth (smile) */
+.sprite-plant::after {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 8px;
+  border-bottom: 3px solid #1B5E20;
+  border-left: 3px solid #1B5E20;
+  border-right: 3px solid #1B5E20;
+  border-radius: 0 0 10px 10px;
+}
+
+.sprite-zombie {
+  width: 56px;
+  height: 56px;
+  background: #9C27B0;
+  border: 4px solid #6A1B9A;
+  border-radius: 4px 4px 8px 8px;
+  position: relative;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+  animation: spritePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Zombie eyes (X-shaped) */
+.sprite-zombie::before {
+  content: '✕ ✕';
+  position: absolute;
+  top: 12px;
+  left: 6px;
+  font-size: 12px;
+  color: #E1BEE7;
+  letter-spacing: 6px;
+  font-family: 'Press Start 2P', monospace;
+  line-height: 1;
+}
+
+/* Zombie mouth (jagged) */
+.sprite-zombie::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 10px;
+  background:
+    linear-gradient(135deg, transparent 33%, #E1BEE7 33%, #E1BEE7 50%, transparent 50%),
+    linear-gradient(-135deg, transparent 33%, #E1BEE7 33%, #E1BEE7 50%, transparent 50%);
+  background-size: 8px 10px;
+}
+
+@keyframes spritePop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================================
+   Panel (for scoreboard, controls, etc.)
+   ============================================================ */
+.pixel-panel {
+  background: var(--panel-bg);
+  border: 4px solid var(--panel-border);
+  border-radius: 2px;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+}
+
+/* ============================================================
+   Pixel Button
+   ============================================================ */
+.pixel-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  padding: 10px 16px;
+  border: 4px solid var(--grid-border);
+  border-radius: 2px;
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+  transition: all 0.1s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pixel-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+.pixel-btn--plant {
+  background: var(--plant-accent);
+  color: white;
+  border-color: #2E7D32;
+}
+
+.pixel-btn--zombie {
+  background: var(--zombie-accent);
+  color: white;
+  border-color: #6A1B9A;
+}
+
+.pixel-btn--small {
+  font-size: 0.45rem;
+  padding: 6px 10px;
+  border-width: 3px;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   Turn Indicator
+   ============================================================ */
+.turn-indicator {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: var(--text-primary);
+  text-align: center;
+  padding: 8px 16px;
+  margin: 12px 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 480px) {
+  .cell {
+    width: 80px;
+    height: 80px;
+  }
+
+  .sprite-plant,
+  .sprite-zombie {
+    width: 44px;
+    height: 44px;
+  }
+
+  .game-title {
+    font-size: 1.1rem;
+  }
+
+  .game-subtitle {
+    font-size: 0.4rem;
+  }
+
+  .celestial-body {
+    width: 40px;
+    height: 40px;
+    top: 16px;
+    right: 16px;
+  }
+}
+
+/* ============================================================
+   Reduced Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
